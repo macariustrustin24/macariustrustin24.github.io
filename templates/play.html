@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Play games or watch YouTube videos inside the browser."><title>Playbox — Games & Videos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Nunito:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="play-page">
+  <header class="header"><a class="brand" href="{{ url_for('home') }}"><span>▶</span> PLAYBOX</a><nav><a href="{{ url_for('home') }}#games">Games</a><a href="#video-player">YouTube</a></nav>{% if current_user %}<div class="account-menu"><span class="avatar">{{ current_user['username'][0].upper() }}</span><span class="user-name">{{ current_user['username'] }}</span><form method="post" action="{{ url_for('logout') }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button type="submit">Log out</button></form></div>{% else %}<div class="account-links"><a href="{{ url_for('login') }}">Log in</a><a class="signup" href="{{ url_for('register') }}">Sign up</a></div>{% endif %}</header>
+  <main>
+    <section class="content-grid">
+      <div class="games-panel">
+        <div class="section-title"><p class="kicker">LIVE GAMES</p><h2>Play now</h2></div>
+        <div class="game-grid">{% for game in games %}
+          <article class="game-card {{ game.accent }}"><div class="card-top"><span class="game-icon">{{ game.emoji }}</span><span class="game-number">0{{ loop.index }}</span></div><div><p class="controls">{{ game.controls }}</p><h3>{{ game.title }}</h3><p class="description">{{ game.description }}</p><p class="goal">{{ game.goal }}</p><div class="score-row"><span>Best:</span><strong>{{ user_scores[game.id] if user_scores.get(game.id) else '—' }}</strong></div><button class="play-button" data-game="{{ game.id }}">Play now <span>→</span></button></div></article>{% endfor %}</div>
+      </div>
+      <aside class="video-panel" id="video-player">
+        <div class="section-title"><p class="kicker">VIDEO PLAYER</p><h2>Watch YouTube inside Playbox</h2></div>
+        <button type="button" class="secondary-button ai-button">Ask AI</button>
+        <div class="video-card">
+          <form id="youtube-form" class="youtube-form">
+            <label>Paste a YouTube link or ID<input type="text" id="youtube-url" name="youtube_url" placeholder="https://www.youtube.com/watch?v=dQw4w9WgXcQ"></label>
+            <button type="submit" class="auth-submit">Load video</button>
+          </form>
+          <div class="youtube-frame" id="youtube-frame"><p>Enter a YouTube URL above to play without leaving the site.</p></div>
+          <div class="proxy-note">Uses the site proxy for safer YouTube access.</div>
+        </div>
+      </aside>
+    </section>
+  </main>
+  <footer><a class="brand" href="/"><span>▶</span> PLAYBOX</a><p>Games, videos, and small moments.</p></footer>
+  <div class="modal" id="game-modal" aria-hidden="true"><div class="game-window"><button class="close" aria-label="Close game">×</button><div id="game-area"></div></div></div>
+  <div class="modal" id="ai-modal" aria-hidden="true"><div class="game-window ai-window"><button class="close" data-close="ai" aria-label="Close AI assistant">×</button><div class="ai-header"><h2>AI Assistant</h2><p>Ask about games, strategy, or how to use Playbox.</p></div><div class="ai-chat" id="ai-chat"><div class="ai-empty"><p>Type a question and the assistant will reply here.</p></div></div><form id="ai-form" class="ai-form"><label>Ask a question<textarea id="ai-prompt" name="prompt" rows="4" placeholder="What game is best for a quick break?"></textarea></label><div class="ai-actions"><span class="ai-status" id="ai-status">AI is ready.</span><button type="submit" class="auth-submit">Send</button></div></form></div></div>
+  <script>window.PLAYBOX = { userScores: {{ user_scores|tojson }}, csrfToken: '{{ csrf_token() }}', userLoggedIn: {{ 'true' if current_user else 'false' }} };</script>
+  <script src="{{ url_for('static', filename='games.js') }}"></script>
+  <script src="{{ url_for('static', filename='youtube.js') }}"></script>
+  <script src="{{ url_for('static', filename='ai.js') }}"></script>
+</body>
+</html>

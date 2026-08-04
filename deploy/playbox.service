@@ -1,0 +1,15 @@
+[Unit]
+Description=Playbox Flask application
+After=network.target
+
+[Service]
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/playbox
+Environment="PATH=/var/www/playbox/.venv/bin"
+EnvironmentFile=-/etc/playbox.env
+ExecStart=/var/www/playbox/.venv/bin/gunicorn --workers 3 --bind 127.0.0.1:8000 wsgi:app
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

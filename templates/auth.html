@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Sign in to Playbox."><title>{% if mode == 'login' %}Log in{% else %}Create an account{% endif %} — Playbox</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Nunito:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="auth-page">
+  <header class="header"><a class="brand" href="{{ url_for('home') }}"><span>▶</span> PLAYBOX</a><a class="back-link" href="{{ url_for('home') }}">← Back to games</a></header>
+  <main class="auth-main">
+    <section class="auth-card">
+      <p class="kicker">{% if mode == 'login' %}WELCOME BACK{% else %}JOIN PLAYBOX{% endif %}</p>
+      <h1>{% if mode == 'login' %}Let’s play.{% else %}Make it yours.{% endif %}</h1>
+      <p class="auth-copy">{% if mode == 'login' %}Sign in to pick up where you left off.{% else %}Create an account to make Playbox feel like home.{% endif %}</p>
+      {% with messages = get_flashed_messages(with_categories=true) %}{% if messages %}<div class="flash-stack" aria-live="polite">{% for category, message in messages %}<p class="flash {{ category }}">{{ message }}</p>{% endfor %}</div>{% endif %}{% endwith %}
+      <form method="post" class="auth-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <label>Username<input name="username" value="{{ request.form.get('username', '') }}" autocomplete="username" minlength="3" maxlength="30" pattern="[A-Za-z0-9_]+" required autofocus></label>
+        <label>Password<input name="password" type="password" autocomplete="{% if mode == 'login' %}current-password{% else %}new-password{% endif %}" minlength="8" maxlength="128" required></label>
+        {% if mode == 'register' %}<label>Confirm password<input name="password_confirm" type="password" autocomplete="new-password" minlength="8" maxlength="128" required></label>{% endif %}
+        <button class="auth-submit" type="submit">{% if mode == 'login' %}Log in{% else %}Create account{% endif %} <span>→</span></button>
+      </form>
+      <p class="auth-switch">{% if mode == 'login' %}New to Playbox? <a href="{{ url_for('register') }}">Create an account</a>{% else %}Already have an account? <a href="{{ url_for('login') }}">Log in</a>{% endif %}</p>
+    </section>
+  </main>
+</body>
+</html>
